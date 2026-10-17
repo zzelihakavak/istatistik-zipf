@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="tr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Zipf Yasası — İnteraktif Eğitim Portalı</title>
+    <meta name="description" content="Zipf dağılımını matematikten dile, şehirlerden internete kadar gerçek verilerle keşfedin." />
+
+    <!-- Tailwind CSS (CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+
+    <!-- KaTeX (Matematik Formülleri) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" />
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/contrib/auto-render.min.js"
+        onload="renderMathInElement(document.body, { delimiters: [{ left: '$$', right: '$$', display: true },{ left: '$', right: '$', display: false }], throwOnError: false });"></script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css" />
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        dark: '#090d16',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-[#090d16] text-slate-200 antialiased">
+
+<!-- =========================================================
+     NAVBAR
+========================================================= -->
+<nav class="fixed top-0 left-0 right-0 z-50 bg-[#090d16]/80 backdrop-blur-md border-b border-white/5">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+
+            <!-- Logo -->
+            <a href="#hero" class="flex items-center gap-3 group">
+                <div class="w-8 h-8 rounded-lg bg-indigo-600/80 flex items-center justify-center text-white text-sm font-black shadow-lg shadow-indigo-600/20 group-hover:scale-110 transition-transform">
+                    Z
+                </div>
+                <span class="text-base font-bold tracking-tight hidden sm:block">
+                    <span class="text-white">Zipf</span>
+                    <span class="text-indigo-400">Yasası</span>
+                </span>
+            </a>
+
+            <!-- Desktop Nav Links -->
+            <div class="hidden md:flex items-center gap-1">
+                <a href="#theory" class="px-3 py-2 rounded-lg text-sm text-slate-400 hover:text-white hover:bg-white/5 transition-all">Teori</a>
+                <a href="#simulator" class="px-3 py-2 rounded-lg text-sm text-slate-400 hover:text-white hover:bg-white/5 transition-all">Simülatör</a>
+                <a href="#text-analysis" class="px-3 py-2 rounded-lg text-sm text-slate-400 hover:text-white hover:bg-white/5 transition-all">Metin Analizi</a>
+                <a href="#cities" class="px-3 py-2 rounded-lg text-sm text-slate-400 hover:text-white hover:bg-white/5 transition-all">Şehirler</a>
+                <a href="#applications" class="px-3 py-2 rounded-lg text-sm text-slate-400 hover:text-white hover:bg-white/5 transition-all">Uygulamalar</a>
+                <a href="#quiz" class="ml-2 px-4 py-2 rounded-lg text-sm font-semibold bg-indigo-600/20 text-indigo-300 border border-indigo-500/30 hover:bg-indigo-600/40 transition-all">Bilgi Testi</a>
+            </div>
+
+            <!-- Mobile menu button -->
+            <button id="mobile-menu-btn" class="md:hidden p-2 rounded-lg text-slate-400 hover:bg-white/5">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Mobile Nav -->
+        <div id="mobile-menu" class="hidden md:hidden pb-4 border-t border-white/5 pt-4 space-y-1">
+            <a href="#theory" class="block px-3 py-2 rounded-lg text-sm text-slate-400 hover:text-white hover:bg-white/5">Teori</a>
+            <a href="#simulator" class="block px-3 py-2 rounded-lg text-sm text-slate-400 hover:text-white hover:bg-white/5">Simülatör</a>
+            <a href="#text-analysis" class="block px-3 py-2 rounded-lg text-sm text-slate-400 hover:text-white hover:bg-white/5">Metin Analizi</a>
+            <a href="#cities" class="block px-3 py-2 rounded-lg text-sm text-slate-400 hover:text-white hover:bg-white/5">Şehirler</a>
+            <a href="#applications" class="block px-3 py-2 rounded-lg text-sm text-slate-400 hover:text-white hover:bg-white/5">Uygulamalar</a>
+            <a href="#quiz" class="block px-3 py-2 rounded-lg text-sm text-slate-400 hover:text-white hover:bg-white/5">Bilgi Testi</a>
+        </div>
+    </div>
+</nav>
+
+
+<!-- =========================================================
+     HERO SECTION
+========================================================= -->
+<section id="hero" class="relative min-h-screen flex flex-col items-center justify-center text-center pt-24 pb-16 px-4 overflow-hidden bg-mesh">
+
+    <!-- Decorative background blobs -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-1/4 left-1/4 w-96 h-96 rounded-full bg-indigo-600/8 blur-3xl animate-pulse"></div>
+        <div class="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full bg-sky-500/8 blur-3xl animate-pulse" style="animation-delay: 1.5s;"></div>
+        <div class="absolute top-1/2 right-1/3 w-64 h-64 rounded-full bg-violet-600/6 blur-3xl animate-pulse" style="animation-delay: 3s;"></div>
+    </div>
+
+    <!-- Main Hero Content -->
+    <div class="relative z-10 max-w-4xl mx-auto">
+
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 mb-8 rounded-full bg-indigo-500/10 border border-indigo-500/25 text-indigo-300 text-xs font-semibold tracking-widest uppercase">
+            <span class="w-2 h-2 rounded-full bg-indigo-400 animate-ping"></span>
+            İnteraktif İstatistik Eğitimi
+        </div>
+
+        <h1 class="text-5xl sm:text-6xl md:text-7xl font-black mb-6 leading-tight tracking-tight">
+            <span class="text-white">Zipf</span>
+            <span class="block bg-gradient-to-r from-indigo-400 via-violet-400 to-sky-400 bg-clip-text text-transparent">Yasası</span>
+        </h1>
+
+        <p class="text-lg sm:text-xl text-slate-400 max-w-2xl mx-auto mb-4 leading-relaxed">
+            Konuştuğunuz dilin, yaşadığınız şehirlerin ve internette gezdiğiniz web sitelerinin hepsinde saklı olan tek bir matematiksel düzen:
+        </p>
+
+        <div class="text-4xl sm:text-5xl font-mono font-black text-indigo-300/90 my-8 tracking-tight">
+            $$f(r) = \frac{C}{r^s}$$
+        </div>
+
+        <p class="text-base text-slate-500 max-w-xl mx-auto mb-10 leading-relaxed">
+            Türkçe metinleri analiz edin, şehir nüfuslarını keşfedin, parametreleri değiştirin ve bu evrensel yasayı kendiniz keşfedin.
+        </p>
+
+        <div class="flex flex-wrap justify-center gap-4">
+            <a href="#simulator"
+               class="px-6 py-3.5 rounded-xl font-semibold bg-indigo-600 hover:bg-indigo-500 text-white transition-all shadow-lg shadow-indigo-600/30 hover:shadow-indigo-500/40 hover:-translate-y-0.5 text-sm sm:text-base">
+                ⚗️ Simülatörü Dene
+            </a>
+            <a href="#theory"
+               class="px-6 py-3.5 rounded-xl font-semibold bg-white/5 hover:bg-white/10 text-slate-200 border border-white/10 transition-all hover:-translate-y-0.5 text-sm sm:text-base">
+                📐 Teoriyi İncele
+            </a>
+        </div>
+
+        <!-- Mini stats row -->
+        <div class="mt-16 grid grid-cols-3 gap-4 max-w-lg mx-auto">
+            <div class="glass-card rounded-xl p-4 text-center">
+                <div class="text-2xl font-black text-indigo-400 font-mono">5</div>
+                <div class="text-xs text-slate-500 mt-1">İnteraktif Modül</div>
+            </div>
+            <div class="glass-card rounded-xl p-4 text-center">
+                <div class="text-2xl font-black text-sky-400 font-mono">35+</div>
+                <div class="text-xs text-slate-500 mt-1">Gerçek Veri</div>
+            </div>
+            <div class="glass-card rounded-xl p-4 text-center">
+                <div class="text-2xl font-black text-violet-400 font-mono">∞</div>
+                <div class="text-xs text-slate-500 mt-1">Metin Analizi</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scroll Indicator -->
+    <div class="absolute bottom-8 left-1/2 -translate-x-1/2 text-slate-600 animate-bounce">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+        </svg>
+    </div>
+</section>
+
+
+<!-- =========================================================
+     TEORİ BÖLÜMÜ
+========================================================= -->
+<section id="theory" class="py-20 px-4 sm:px-6 lg:px-8 bg-[#090d16]">
+    <div class="max-w-6xl mx-auto">
+
+        <!-- Section Header -->
+        <div class="text-center mb-16">
+            <p class="text-xs font-bold uppercase tracking-widest text-indigo-400 mb-3">Matematiksel Temel</p>
+            <h2 class="text-3xl sm:text-4xl font-black text-white mb-4">Zipf Yasası Nedir?</h2>
+            <p class="text-slate-400 max-w-2xl mx-auto">George Kingsley Zipf'in keşfettiği bu düzenlilik, doğal dillerdeki kelimelerin frekansları ile sıraları arasında güçlü bir ters orantı olduğunu ortaya koyar. Aşağıda formülleri parça parça inceleyelim.</p>
+        </div>
+
+        <!-- ① Keşfin Hikayesi -->
+        <div class="glass-card rounded-2xl p-8 mb-8">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-8 h-8 rounded-full bg-indigo-600/30 border border-indigo-500/40 flex items-center justify-center text-indigo-300 font-black text-sm shrink-0">①</div>
+                <h3 class="text-xl font-bold text-white">Keşfin Hikâyesi — James Joyce'un Ulysses'i</h3>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="space-y-4 text-sm text-slate-300 leading-relaxed">
+                    <p>
+                        Harvard dilbilim profesörü <strong class="text-white">George Kingsley Zipf</strong> (1902–1950), İngilizce metinleri incelerken çarpıcı bir örüntü keşfeder. James Joyce'un <em>Ulysses</em> romanındaki kelime sıklığını saydığında şunu görür:
+                    </p>
+                    <ul class="space-y-1.5 text-slate-400 text-xs">
+                        <li class="flex items-start gap-2"><span class="text-indigo-400 mt-0.5">→</span> 1. kelime olan <strong class="text-white">"the"</strong> ≈ 69,000 kez geçer</li>
+                        <li class="flex items-start gap-2"><span class="text-sky-400 mt-0.5">→</span> 2. kelime olan <strong class="text-white">"of"</strong> ≈ 36,000 kez (≈ 69K / 2)</li>
+                        <li class="flex items-start gap-2"><span class="text-violet-400 mt-0.5">→</span> 3. kelime olan <strong class="text-white">"and"</strong> ≈ 28,000 kez (≈ 69K / 3)</li>
+                        <li class="flex items-start gap-2"><span class="text-emerald-400 mt-0.5">→</span> 100. kelime ≈ 690 kez (≈ 69K / 100)</li>
+                    </ul>
+                    <p class="text-slate-400">
+                        Örüntü net: her kelime, <strong class="text-amber-400">sırasının ters katı</strong> kadar kullanılmaktadır. Bu "Zipf Yasası"nın özüdür.
+                    </p>
+                    <div class="bg-amber-500/5 border border-amber-500/20 rounded-xl p-3 text-xs text-amber-300">
+                        💡 Zipf bu örüntüyü 1949'da <em>"Human Behavior and the Principle of Least Effort"</em> adlı kitabında yayımlar. Konuşmacıların enerjiyi (kelime çeşitliliğini) minimize etme eğilimini <strong>En Az Çaba İlkesi</strong> olarak adlandırır.
+                    </div>
+                </div>
+
+                <!-- Görsel örnek tablo -->
+                <div class="bg-slate-900/70 rounded-xl border border-slate-800 overflow-hidden">
+                    <div class="px-4 py-3 bg-slate-800/50 text-xs font-bold text-slate-400 uppercase tracking-wider">
+                        Ulysses — Kelime Sıklığı (s = 1)
+                    </div>
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="text-xs text-slate-500 border-b border-slate-800">
+                                <th class="py-2 px-4 text-left">Sıra (r)</th>
+                                <th class="py-2 px-4 text-left">Kelime</th>
+                                <th class="py-2 px-4 text-right">Gerçek</th>
+                                <th class="py-2 px-4 text-right">69K / r</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-800/60">
+                            <tr class="hover:bg-slate-800/20">
+                                <td class="py-2 px-4 text-indigo-400 font-bold">1</td>
+                                <td class="py-2 px-4 font-mono text-white">the</td>
+                                <td class="py-2 px-4 text-right text-slate-300">69,000</td>
+                                <td class="py-2 px-4 text-right text-emerald-400 font-mono">69,000</td>
+                            </tr>
+                            <tr class="hover:bg-slate-800/20">
+                                <td class="py-2 px-4 text-indigo-400 font-bold">2</td>
+                                <td class="py-2 px-4 font-mono text-white">of</td>
+                                <td class="py-2 px-4 text-right text-slate-300">36,000</td>
+                                <td class="py-2 px-4 text-right text-emerald-400 font-mono">34,500</td>
+                            </tr>
+                            <tr class="hover:bg-slate-800/20">
+                                <td class="py-2 px-4 text-indigo-400 font-bold">3</td>
+                                <td class="py-2 px-4 font-mono text-white">and</td>
+                                <td class="py-2 px-4 text-right text-slate-300">28,000</td>
+                                <td class="py-2 px-4 text-right text-emerald-400 font-mono">23,000</td>
+                            </tr>
+                            <tr class="hover:bg-slate-800/20">
+                                <td class="py-2 px-4 text-indigo-400 font-bold">10</td>
+                                <td class="py-2 px-4 font-mono text-white">he</td>
+                                <td class="py-2 px-4 text-right text-slate-300">9,700</td>
+                                <td class="py-2 px-4 text-right text-emerald-400 font-mono">6,900</td>
+                            </tr>
+                            <tr class="hover:bg-slate-800/20">
+                                <td class="py-2 px-4 text-indigo-400 font-bold">100</td>
+                                <td class="py-2 px-4 font-mono text-white">long</td>
+                                <td class="py-2 px-4 text-right text-slate-300">680</td>
+                                <td class="py-2 px-4 text-right text-emerald-400 font-mono">690</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="px-4 py-2 bg-slate-800/30 text-xs text-slate-500 text-center">
+                        En yakın tahminler en yüksek sıralarda — klasik Zipf uyumu ✓
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ② Temel Formül — Anatomisi -->
+        <div class="glass-card rounded-2xl p-8 mb-8">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-8 h-8 rounded-full bg-sky-600/30 border border-sky-500/40 flex items-center justify-center text-sky-300 font-black text-sm shrink-0">②</div>
+                <h3 class="text-xl font-bold text-white">Temel Formül — Her Parçasını Anlayalım</h3>
+            </div>
+
+            <!-- Ana formül gösterimi -->
+            <div class="bg-gradient-to-r from-indigo-900/30 via-slate-900/50 to-violet-900/30 border border-indigo-500/25 rounded-2xl p-6 mb-8 text-center">
+                <div class="text-5xl sm:text-6xl font-black font-mono text-white tracking-tight mb-2">
+                    $$f(r) = \frac{C}{r^{\,s}}$$
+                </div>
+                <p class="text-slate-500 text-xs mt-2">Zipf Yasası — Temel Form</p>
+            </div>
+
+            <!-- Parça parça açıklama -->
+            <div class="grid sm:grid-cols-3 gap-4 mb-8">
+                <!-- f(r) -->
+                <div class="bg-indigo-500/5 border border-indigo-500/20 rounded-xl p-5">
+                    <div class="text-3xl font-black font-mono text-indigo-400 mb-3">f(r)</div>
+                    <h4 class="text-sm font-bold text-white mb-2">Frekans (Sıklık)</h4>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        <strong class="text-slate-300">r. sıradaki öğenin</strong> kaç kez gözlemlendiğidir. Örneğin dilde 3. sık kelime ise "and" kelimesinin tekrar sayısı, şehirlerde 3. büyük şehrin nüfusudur.
+                    </p>
+                    <div class="mt-3 text-xs font-mono bg-indigo-900/30 rounded-lg p-2 text-indigo-300">
+                        Örnek: f(3) = kaç kez tekrarlandı?
+                    </div>
+                </div>
+
+                <!-- C -->
+                <div class="bg-emerald-500/5 border border-emerald-500/20 rounded-xl p-5">
+                    <div class="text-3xl font-black font-mono text-emerald-400 mb-3">C</div>
+                    <h4 class="text-sm font-bold text-white mb-2">Normalleştirme Sabiti</h4>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        En yüksek sıradaki öğenin (r = 1) frekansıdır. Tüm formülü bu referans noktasına göre ölçekler. Farklı metinlerin <strong class="text-slate-300">toplam boyutuna</strong> göre değişir.
+                    </p>
+                    <div class="mt-3 text-xs font-mono bg-emerald-900/30 rounded-lg p-2 text-emerald-300">
+                        C = f(1) → "the" için ≈ 69,000
+                    </div>
+                </div>
+
+                <!-- s -->
+                <div class="bg-violet-500/5 border border-violet-500/20 rounded-xl p-5">
+                    <div class="text-3xl font-black font-mono text-violet-400 mb-3">s</div>
+                    <h4 class="text-sm font-bold text-white mb-2">Zipf Üssü (Eğim)</h4>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        Dağılımın <strong class="text-slate-300">ne kadar sarp düştüğünü</strong> belirler. <span class="text-violet-300">s = 1</span> → klasik Zipf. <span class="text-violet-300">s &gt; 1</span> → frekanslar daha hızlı düşer. <span class="text-violet-300">s &lt; 1</span> → yavaş düşer.
+                    </p>
+                    <div class="mt-3 text-xs font-mono bg-violet-900/30 rounded-lg p-2 text-violet-300">
+                        Doğal diller: s ≈ 0.9 – 1.1
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sayısal örnek adımları -->
+            <div class="bg-slate-900/60 border border-slate-700/60 rounded-xl p-6">
+                <h4 class="text-sm font-bold text-white mb-4 flex items-center gap-2">
+                    <span class="text-amber-400">🔢</span> Adım Adım Sayısal Örnek
+                </h4>
+                <p class="text-xs text-slate-400 mb-5">Diyelim ki en sık kelime (r=1) bir metinde <strong class="text-white">10,000</strong> kez geçiyor ve <strong class="text-white">s = 1</strong> (klasik Zipf). O zaman:</p>
+
+                <div class="grid sm:grid-cols-4 gap-3">
+                    <div class="text-center bg-slate-800/60 rounded-xl p-3">
+                        <div class="text-xs text-slate-500 mb-1">Sıra 1 → <em>"ve"</em></div>
+                        <div class="font-mono font-bold text-white">10,000 / 1¹</div>
+                        <div class="text-indigo-400 font-black text-xl mt-1">10,000</div>
+                    </div>
+                    <div class="text-center bg-slate-800/60 rounded-xl p-3">
+                        <div class="text-xs text-slate-500 mb-1">Sıra 2 → <em>"bir"</em></div>
+                        <div class="font-mono font-bold text-white">10,000 / 2¹</div>
+                        <div class="text-sky-400 font-black text-xl mt-1">5,000</div>
+                    </div>
+                    <div class="text-center bg-slate-800/60 rounded-xl p-3">
+                        <div class="text-xs text-slate-500 mb-1">Sıra 5 → <em>"bu"</em></div>
+                        <div class="font-mono font-bold text-white">10,000 / 5¹</div>
+                        <div class="text-violet-400 font-black text-xl mt-1">2,000</div>
+                    </div>
+                    <div class="text-center bg-slate-800/60 rounded-xl p-3">
+                        <div class="text-xs text-slate-500 mb-1">Sıra 10 → <em>"de"</em></div>
+                        <div class="font-mono font-bold text-white">10,000 / 10¹</div>
+                        <div class="text-emerald-400 font-black text-xl mt-1">1,000</div>
+                    </div>
+                </div>
+
+                <p class="text-xs text-slate-500 mt-4 text-center">
+                    Sıra 10 kat arttığında frekans 10 kat azalır → <strong class="text-white">Ters orantı</strong> (s=1 durumunda)
+                </p>
+            </div>
+        </div>
+
+        <!-- ③ Olasılık Formülü -->
+        <div class="glass-card rounded-2xl p-8 mb-8">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-8 h-8 rounded-full bg-violet-600/30 border border-violet-500/40 flex items-center justify-center text-violet-300 font-black text-sm shrink-0">③</div>
+                <h3 class="text-xl font-bold text-white">Olasılık Formu — Genelleştirilmiş Zipf</h3>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8 items-center">
+                <div>
+                    <div class="bg-violet-900/20 border border-violet-500/20 rounded-xl p-5 mb-4 text-center">
+                        $$P(r;\, s,\, N) = \frac{1/r^s}{\displaystyle\sum_{n=1}^{N} \frac{1}{n^s}}$$
+                    </div>
+                    <div class="space-y-2 text-xs text-slate-400">
+                        <div class="flex gap-2 items-start">
+                            <span class="text-violet-400 font-semibold shrink-0">P(r; s, N)</span>
+                            <span>— r. sıradaki öğenin rastgele seçilme olasılığı</span>
+                        </div>
+                        <div class="flex gap-2 items-start">
+                            <span class="text-white font-semibold shrink-0">N</span>
+                            <span>— toplam farklı öğe sayısı (benzersiz kelime sayısı gibi)</span>
+                        </div>
+                        <div class="flex gap-2 items-start">
+                            <span class="text-amber-400 font-semibold shrink-0">∑ 1/nˢ</span>
+                            <span>— <em>Genelleştirilmiş Harmonik Sayı</em>. Paydada tüm olasılıkların toplamı 1'e eşitlenir (normalleştirme).</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900/70 rounded-xl border border-slate-800 p-5">
+                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Somut Örnek: N = 5, s = 1</h4>
+                    <p class="text-xs text-slate-500 mb-3">Harmonik sayı: H₅ = 1 + 1/2 + 1/3 + 1/4 + 1/5 = <strong class="text-white">2.28</strong></p>
+                    <table class="w-full text-xs">
+                        <thead>
+                            <tr class="text-slate-600 border-b border-slate-800">
+                                <th class="py-1 text-left">Sıra</th>
+                                <th class="py-1 text-right">1/r</th>
+                                <th class="py-1 text-right">P(r) = (1/r) / 2.28</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-800/40">
+                            <tr><td class="py-1.5 text-indigo-400">#1</td><td class="py-1.5 text-right text-white">1.000</td><td class="py-1.5 text-right text-emerald-400 font-mono">%43.9</td></tr>
+                            <tr><td class="py-1.5 text-indigo-400">#2</td><td class="py-1.5 text-right text-white">0.500</td><td class="py-1.5 text-right text-emerald-400 font-mono">%21.9</td></tr>
+                            <tr><td class="py-1.5 text-indigo-400">#3</td><td class="py-1.5 text-right text-white">0.333</td><td class="py-1.5 text-right text-emerald-400 font-mono">%14.6</td></tr>
+                            <tr><td class="py-1.5 text-indigo-400">#4</td><td class="py-1.5 text-right text-white">0.250</td><td class="py-1.5 text-right text-emerald-400 font-mono">%11.0</td></tr>
+                            <tr><td class="py-1.5 text-indigo-400">#5</td><td class="py-1.5 text-right text-white">0.200</td><td class="py-1.5 text-right text-emerald-400 font-mono">%8.8</td></tr>
+                            <tr class="font-bold"><td class="py-1.5">Toplam</td><td class="py-1.5 text-right text-slate-400">2.283</td><td class="py-1.5 text-right text-white">%100 ✓</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ④ Log-Log Dönüşümü -->
+        <div class="glass-card rounded-2xl p-8 mb-8">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-8 h-8 rounded-full bg-amber-600/30 border border-amber-500/40 flex items-center justify-center text-amber-300 font-black text-sm shrink-0">④</div>
+                <h3 class="text-xl font-bold text-white">Log-Log Dönüşümü — Neden Düz Doğru Oluşur?</h3>
+            </div>
+
+            <p class="text-slate-400 text-sm mb-6">Zipf yasasının en güçlü görsel testi Log-Log grafiktir. Formülün logaritmasını aldığımızda ne olduğunu adım adım izleyelim:</p>
+
+            <div class="grid md:grid-cols-5 items-center gap-4 mb-6">
+                <!-- Adım 1 -->
+                <div class="md:col-span-2 bg-slate-800/60 rounded-xl p-4 text-center">
+                    <p class="text-xs text-slate-500 mb-2">Başlangıç formülü</p>
+                    <div>$$f(r) = \frac{C}{r^s}$$</div>
+                </div>
+                <div class="flex justify-center text-slate-500 text-2xl font-bold">→</div>
+                <!-- Adım 2 -->
+                <div class="md:col-span-2 bg-slate-800/60 rounded-xl p-4 text-center">
+                    <p class="text-xs text-slate-500 mb-2">Her iki tarafın logaritması</p>
+                    <div>$$\log f = \log C - s \cdot \log r$$</div>
+                </div>
+            </div>
+
+            <!-- Doğru denklemi ile karşılaştırma -->
+            <div class="bg-amber-500/5 border border-amber-500/20 rounded-xl p-6 mb-6">
+                <div class="grid sm:grid-cols-2 gap-6">
+                    <div class="text-center">
+                        <p class="text-xs font-semibold text-amber-400 uppercase tracking-wider mb-3">Log-Log Zipf Denklemi</p>
+                        <div>$$\underbrace{\log f}_{y} = \underbrace{\log C}_{b} - \underbrace{s}_{|eğim|} \cdot \underbrace{\log r}_{x}$$</div>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-xs font-semibold text-sky-400 uppercase tracking-wider mb-3">Standart Doğru Denklemi</p>
+                        <div>$$y = b + m \cdot x$$</div>
+                        <p class="text-xs text-slate-500 mt-2">Buradan: m = −s (negatif eğim), b = log C (y-ekseni kesişimi)</p>
+                    </div>
+                </div>
+                <div class="mt-4 text-center text-xs text-amber-300 font-semibold">
+                    ✓ Log-Log grafiğinde Zipf dağılımı, eğimi <strong>−s</strong> olan mükemmel bir düz doğru çizer!
+                </div>
+            </div>
+
+            <div class="grid sm:grid-cols-3 gap-4 text-center text-xs">
+                <div class="bg-slate-800/40 rounded-xl p-4">
+                    <div class="text-2xl mb-2">📈</div>
+                    <p class="font-semibold text-white mb-1">Normal Ölçek</p>
+                    <p class="text-slate-500">Kıvrımlı bir eğri görürsünüz — güç yasası olduğu anlaşılır ama ölçmek güçtür.</p>
+                </div>
+                <div class="bg-indigo-500/10 border border-indigo-500/25 rounded-xl p-4">
+                    <div class="text-2xl mb-2">📉</div>
+                    <p class="font-semibold text-white mb-1">Log-Log Ölçek</p>
+                    <p class="text-slate-400">Düz bir doğru görürsünüz. Eğimi ölçerek <strong>s değerini</strong> doğrudan okursunuz.</p>
+                </div>
+                <div class="bg-slate-800/40 rounded-xl p-4">
+                    <div class="text-2xl mb-2">🔭</div>
+                    <p class="font-semibold text-white mb-1">R² Değeri</p>
+                    <p class="text-slate-500">Log-Log regresyonunda R² ≈ 0.95–0.99 ise güçlü bir Zipf uyumu vardır.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ⑤ s Parametresinin Etkisi -->
+        <div class="glass-card rounded-2xl p-8 mb-8">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-8 h-8 rounded-full bg-rose-600/30 border border-rose-500/40 flex items-center justify-center text-rose-300 font-black text-sm shrink-0">⑤</div>
+                <h3 class="text-xl font-bold text-white">s Parametresinin Etkisi — Karşılaştırmalı Tablo</h3>
+            </div>
+
+            <p class="text-slate-400 text-sm mb-6">s değeri değiştiğinde aynı 1. sıra frekansı (C = 10,000) için diğer sıraların frekansı nasıl değişir? Aşağıdaki tablo bunu somutlaştırır:</p>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="border-b border-slate-700">
+                            <th class="py-3 px-4 text-left text-slate-400 text-xs font-bold uppercase">Sıra (r)</th>
+                            <th class="py-3 px-4 text-right text-violet-400 text-xs font-bold">s = 0.5 <span class="font-normal">(yavaş düşüş)</span></th>
+                            <th class="py-3 px-4 text-right text-indigo-400 text-xs font-bold">s = 1.0 <span class="font-normal">(klasik Zipf)</span></th>
+                            <th class="py-3 px-4 text-right text-rose-400 text-xs font-bold">s = 2.0 <span class="font-normal">(hızlı düşüş)</span></th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-800/50 text-xs font-mono">
+                        <tr class="hover:bg-slate-800/20">
+                            <td class="py-2.5 px-4 font-sans text-slate-300">1. sıra</td>
+                            <td class="py-2.5 px-4 text-right text-violet-300">10,000</td>
+                            <td class="py-2.5 px-4 text-right text-indigo-300">10,000</td>
+                            <td class="py-2.5 px-4 text-right text-rose-300">10,000</td>
+                        </tr>
+                        <tr class="hover:bg-slate-800/20">
+                            <td class="py-2.5 px-4 font-sans text-slate-300">2. sıra</td>
+                            <td class="py-2.5 px-4 text-right text-violet-300">7,071</td>
+                            <td class="py-2.5 px-4 text-right text-indigo-300">5,000</td>
+                            <td class="py-2.5 px-4 text-right text-rose-300">2,500</td>
+                        </tr>
+                        <tr class="hover:bg-slate-800/20">
+                            <td class="py-2.5 px-4 font-sans text-slate-300">5. sıra</td>
+                            <td class="py-2.5 px-4 text-right text-violet-300">4,472</td>
+                            <td class="py-2.5 px-4 text-right text-indigo-300">2,000</td>
+                            <td class="py-2.5 px-4 text-right text-rose-300">400</td>
+                        </tr>
+                        <tr class="hover:bg-slate-800/20">
+                            <td class="py-2.5 px-4 font-sans text-slate-300">10. sıra</td>
+                            <td class="py-2.5 px-4 text-right text-violet-300">3,162</td>
+                            <td class="py-2.5 px-4 text-right text-indigo-300">1,000</td>
+                            <td class="py-2.5 px-4 text-right text-rose-300">100</td>
+                        </tr>
+                        <tr class="hover:bg-slate-800/20">
+                            <td class="py-2.5 px-4 font-sans text-slate-300">100. sıra</td>
+                            <td class="py-2.5 px-4 text-right text-violet-300">1,000</td>
+                            <td class="py-2.5 px-4 text-right text-indigo-300">100</td>
+                            <td class="py-2.5 px-4 text-right text-rose-300">1</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="text-xs text-slate-500 mt-3 text-center">Hesaplama: f(r) = 10,000 / r<sup>s</sup> &nbsp;|&nbsp; s büyüdükçe kuyruk daha hızlı incelir</p>
+        </div>
+
+        <!-- ⑥ Güç Yasası Ailesi -->
+        <div class="glass-card rounded-2xl p-8 mb-8">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-8 h-8 rounded-full bg-emerald-600/30 border border-emerald-500/40 flex items-center justify-center text-emerald-300 font-black text-sm shrink-0">⑥</div>
+                <h3 class="text-xl font-bold text-white">Güç Yasası (Power Law) Ailesi</h3>
+            </div>
+            <p class="text-slate-400 text-sm mb-6">Zipf yasası, "Power Law" ailesinin bir üyesidir. Bu aile birbiriyle matematiksel olarak bağlantılı yasalar içerir:</p>
+
+            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <div class="glass-card glass-card-interactive rounded-xl p-5 text-center cursor-default">
+                    <div class="text-2xl mb-3">📚</div>
+                    <h4 class="font-bold text-white text-sm mb-1">Kelime Sıklığı</h4>
+                    <p class="text-xs text-slate-500 mb-3">Tüm doğal dillerde</p>
+                    <div class="text-xs font-mono text-indigo-400 bg-indigo-500/10 rounded-lg px-2 py-1">s ≈ 1.0</div>
+                </div>
+                <div class="glass-card glass-card-interactive rounded-xl p-5 text-center cursor-default">
+                    <div class="text-2xl mb-3">🏙️</div>
+                    <h4 class="font-bold text-white text-sm mb-1">Şehir Nüfusları</h4>
+                    <p class="text-xs text-slate-500 mb-3">Rank-size kuralı</p>
+                    <div class="text-xs font-mono text-sky-400 bg-sky-500/10 rounded-lg px-2 py-1">s ≈ 1.0</div>
+                </div>
+                <div class="glass-card glass-card-interactive rounded-xl p-5 text-center cursor-default">
+                    <div class="text-2xl mb-3">💰</div>
+                    <h4 class="font-bold text-white text-sm mb-1">Pareto — Gelir</h4>
+                    <p class="text-xs text-slate-500 mb-3">%20 → %80 kuralı</p>
+                    <div class="text-xs font-mono text-amber-400 bg-amber-500/10 rounded-lg px-2 py-1">s ≈ 1.16</div>
+                </div>
+                <div class="glass-card glass-card-interactive rounded-xl p-5 text-center cursor-default">
+                    <div class="text-2xl mb-3">🌍</div>
+                    <h4 class="font-bold text-white text-sm mb-1">Depremler</h4>
+                    <p class="text-xs text-slate-500 mb-3">Gutenberg-Richter</p>
+                    <div class="text-xs font-mono text-rose-400 bg-rose-500/10 rounded-lg px-2 py-1">b ≈ 1.0</div>
+                </div>
+            </div>
+
+            <div class="bg-slate-800/40 rounded-xl p-4 text-xs text-slate-400 leading-relaxed">
+                <strong class="text-white">Pareto ile Zipf arasındaki bağlantı:</strong> İkisi matematiksel olarak birbirine dönüştürülebilir güç yasalarıdır. Zipf dağılımı öğeleri büyüklük sırasına göre dizerken (sıra → büyüklük), Pareto belirli bir eşiği aşan öğelerin yüzdesini verir (oran → miktar). Aynı madalyonun iki yüzüdür.
+            </div>
+        </div>
+
+        <!-- ⑦ Neden Ortaya Çıkar? -->
+        <div class="glass-card rounded-2xl p-8">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-8 h-8 rounded-full bg-slate-600/30 border border-slate-500/40 flex items-center justify-center text-slate-300 font-black text-sm shrink-0">⑦</div>
+                <h3 class="text-xl font-bold text-white">Neden Bu Düzen Ortaya Çıkar?</h3>
+            </div>
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="space-y-3">
+                    <div class="text-indigo-400 font-bold text-sm flex items-center gap-2">💬 Dilbilimsel Açıklama</div>
+                    <p class="text-slate-400 text-sm leading-relaxed">Konuşmacılar hem üretim (az kelime, çok kullanım) hem de anlama (zengin dağarcık) arasında optimum denge kurar. Bu denge güç yasasını doğurur.</p>
+                    <div class="text-xs text-slate-500 italic">— Zipf, 1949</div>
+                </div>
+                <div class="space-y-3">
+                    <div class="text-sky-400 font-bold text-sm flex items-center gap-2">📊 İstatistiksel Açıklama</div>
+                    <p class="text-slate-400 text-sm leading-relaxed">Keyfi sembolik dizilimler üzerindeki simülasyonlar, anlamlı içerik olmaksızın yalnızca uzunluk dağılımından bile Zipf benzeri örüntü üretir.</p>
+                    <div class="text-xs text-slate-500 italic">— Miller, 1957</div>
+                </div>
+                <div class="space-y-3">
+                    <div class="text-violet-400 font-bold text-sm flex items-center gap-2">⚙️ Karmaşıklık Teorisi</div>
+                    <p class="text-slate-400 text-sm leading-relaxed">Self-organize kritiklik (SOC) durumundaki sistemler doğal olarak güç yasalarına uyar. Dil, şehirler, ekonomi ve ağlar bu kritik noktada işler.</p>
+                    <div class="text-xs text-slate-500 italic">— Bak, Tang & Wiesenfeld, 1987</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+
+
+
+<!-- =========================================================
+     ZİPF SİMÜLATÖRÜ
+========================================================= -->
+<section id="simulator" class="py-20 px-4 sm:px-6 lg:px-8 bg-[#060a12]">
+    <div class="max-w-6xl mx-auto">
+
+        <div class="text-center mb-12">
+            <p class="text-xs font-bold uppercase tracking-widest text-indigo-400 mb-3">İnteraktif Modül 1</p>
+            <h2 class="text-3xl sm:text-4xl font-black text-white mb-4">Teorik Zipf Simülatörü</h2>
+            <p class="text-slate-400 max-w-2xl mx-auto">Zipf üssünü <strong class="text-white">s</strong> ve öğe sayısını <strong class="text-white">N</strong> değiştirerek dağılımın nasıl şekillendiğini gerçek zamanlı olarak gözlemleyin. Log-Log moduna geçtiğinizde düz doğruyu görün.</p>
+        </div>
+
+        <div class="grid lg:grid-cols-3 gap-8">
+
+            <!-- Kontrol Paneli -->
+            <div class="lg:col-span-1 space-y-6">
+
+                <!-- s slider -->
+                <div class="glass-card rounded-2xl p-6">
+                    <label class="block text-sm font-semibold text-white mb-1">
+                        Zipf Üssü <span class="text-indigo-400">s</span>
+                    </label>
+                    <p class="text-xs text-slate-500 mb-4">Dağılımın ne kadar sarp düştüğünü belirler. s=1 → klasik Zipf, s→0 → düzleşir.</p>
+                    <input id="sim-s-slider" type="range" min="0.1" max="3.0" step="0.05" value="1.0"
+                           class="w-full mb-3 cursor-pointer" />
+                    <div class="flex justify-between text-xs text-slate-500">
+                        <span>Düz (0.1)</span>
+                        <span class="text-lg font-black font-mono text-indigo-400" id="sim-s-val">1.00</span>
+                        <span>Dik (3.0)</span>
+                    </div>
+                </div>
+
+                <!-- N slider -->
+                <div class="glass-card rounded-2xl p-6">
+                    <label class="block text-sm font-semibold text-white mb-1">
+                        Öğe Sayısı <span class="text-sky-400">N</span>
+                    </label>
+                    <p class="text-xs text-slate-500 mb-4">Grafikte gösterilecek farklı sıra sayısı (kelime, şehir, vb.).</p>
+                    <input id="sim-n-slider" type="range" min="5" max="50" step="1" value="25"
+                           class="w-full mb-3 cursor-pointer" />
+                    <div class="flex justify-between text-xs text-slate-500">
+                        <span>5</span>
+                        <span class="text-lg font-black font-mono text-sky-400" id="sim-n-val">25</span>
+                        <span>50</span>
+                    </div>
+                </div>
+
+                <!-- Log Toggle -->
+                <div class="glass-card rounded-2xl p-6">
+                    <label class="flex items-center justify-between cursor-pointer">
+                        <div>
+                            <p class="text-sm font-semibold text-white">Logaritmik Ölçek</p>
+                            <p class="text-xs text-slate-500 mt-0.5">Log-Log görünümünde düz doğru belirir</p>
+                        </div>
+                        <div class="relative">
+                            <input id="sim-log-toggle" type="checkbox" class="sr-only peer" />
+                            <div class="w-11 h-6 bg-slate-700 rounded-full peer peer-checked:bg-indigo-600 transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:w-5 after:h-5 after:rounded-full after:bg-white after:transition-all peer-checked:after:translate-x-5"></div>
+                        </div>
+                    </label>
+                </div>
+
+                <!-- Insight Box -->
+                <div class="bg-amber-500/5 border border-amber-500/20 rounded-2xl p-5">
+                    <p class="text-amber-400 text-xs font-bold uppercase tracking-wider mb-2">💡 İpucu</p>
+                    <p class="text-slate-400 text-xs leading-relaxed">s = 1 yaptığınızda, 2. sıradaki öğe 1.'nin tam yarısı, 3. sıradaki üçte biri kadar tekrar eder — bu <em>klasik Zipf</em> bağıntısıdır. Log-Log moduna geçince bu güç yasasını doğrulayan mükemmel düz çizgiyi göreceksiniz.</p>
+                </div>
+            </div>
+
+            <!-- Grafik + Tablo -->
+            <div class="lg:col-span-2 space-y-6">
+
+                <div class="glass-card rounded-2xl p-6">
+                    <h4 class="text-sm font-semibold text-slate-300 mb-4">Frekans Dağılımı Grafiği</h4>
+                    <div class="relative h-72 sm:h-80">
+                        <canvas id="simulatorChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Tablo -->
+                <div class="glass-card rounded-2xl overflow-hidden">
+                    <div class="px-6 py-4 border-b border-white/5">
+                        <h4 class="text-sm font-semibold text-slate-300">Sıra → Frekans Tablosu (İlk 8 Öğe)</h4>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="text-xs font-bold uppercase tracking-wider text-slate-500 border-b border-slate-800">
+                                    <th class="py-3 px-3 text-left">Sıra (r)</th>
+                                    <th class="py-3 px-3 text-left">Teorik Değer</th>
+                                    <th class="py-3 px-3 text-left">Frekans</th>
+                                    <th class="py-3 px-3 text-right">Oran (%)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sim-table-body">
+                                <!-- JS tarafından doldurulur -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- =========================================================
+     METİN ANALİZÖRÜ
+========================================================= -->
+<section id="text-analysis" class="py-20 px-4 sm:px-6 lg:px-8 bg-[#090d16]">
+    <div class="max-w-6xl mx-auto">
+
+        <div class="text-center mb-12">
+            <p class="text-xs font-bold uppercase tracking-widest text-sky-400 mb-3">İnteraktif Modül 2</p>
+            <h2 class="text-3xl sm:text-4xl font-black text-white mb-4">Canlı Metin Analizi</h2>
+            <p class="text-slate-400 max-w-2xl mx-auto">Herhangi bir Türkçe veya İngilizce metin yapıştırın. Algoritma kelimelerin frekans dağılımını hesaplayarak Zipf Yasası'na ne kadar uyduğunu ölçer ve Zipf üssünü tahmin eder.</p>
+        </div>
+
+        <!-- Örnek Metin Butonları -->
+        <div class="flex flex-wrap justify-center gap-2 mb-8">
+            <button class="sample-text-btn px-4 py-2 rounded-xl text-sm font-semibold bg-indigo-600 text-white border border-indigo-500/30 transition-all hover:scale-105" data-sample="nutuk">
+                🇹🇷 Atatürk Nutuk
+            </button>
+            <button class="sample-text-btn px-4 py-2 rounded-xl text-sm font-semibold bg-slate-800 text-slate-300 border border-slate-700 transition-all hover:scale-105" data-sample="madonna">
+                📖 Kürk Mantolu Madonna
+            </button>
+            <button class="sample-text-btn px-4 py-2 rounded-xl text-sm font-semibold bg-slate-800 text-slate-300 border border-slate-700 transition-all hover:scale-105" data-sample="alice">
+                🐰 Alice in Wonderland (EN)
+            </button>
+            <button class="sample-text-btn px-4 py-2 rounded-xl text-sm font-semibold bg-slate-800 text-slate-300 border border-slate-700 transition-all hover:scale-105" data-sample="bilim">
+                🔭 Popüler Bilim
+            </button>
+        </div>
+
+        <!-- Input Alanı -->
+        <div class="glass-card rounded-2xl p-6 mb-8">
+            <div class="flex flex-col sm:flex-row gap-4 mb-4">
+                <div class="flex-1">
+                    <label class="block text-xs font-semibold text-slate-400 mb-2 uppercase tracking-wider">Analiz Edilecek Metin</label>
+                    <textarea id="text-input" rows="6" placeholder="Metninizi buraya yazın veya yapıştırın… (En az 200 kelime için optimal sonuç)"
+                              class="w-full bg-slate-900/60 border border-slate-700/80 rounded-xl px-4 py-3 text-sm text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-indigo-500/60 resize-y min-h-[130px]"></textarea>
+                </div>
+            </div>
+
+            <div class="flex flex-wrap items-center justify-between gap-4">
+                <label class="flex items-center gap-2 cursor-pointer">
+                    <input id="filter-stopwords-check" type="checkbox" class="w-4 h-4 rounded accent-sky-500" />
+                    <span class="text-sm text-slate-400">Stop Word'leri Filtrele <span class="text-xs text-slate-600">(ve, bir, bu, de…)</span></span>
+                </label>
+
+                <button id="analyze-btn"
+                        class="px-5 py-2.5 rounded-xl font-semibold bg-sky-600 hover:bg-sky-500 text-white transition-all shadow-lg shadow-sky-600/20 text-sm">
+                    🔍 Analiz Et
+                </button>
+            </div>
+        </div>
+
+        <!-- Metrik Kartları -->
+        <div class="grid sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+            <div class="glass-card rounded-xl p-4 text-center">
+                <p class="text-xs font-semibold text-slate-500 mb-1 uppercase">Toplam Kelime</p>
+                <p class="text-2xl font-black font-mono text-sky-400" id="stat-total-words">—</p>
+            </div>
+            <div class="glass-card rounded-xl p-4 text-center">
+                <p class="text-xs font-semibold text-slate-500 mb-1 uppercase">Benzersiz Kelime</p>
+                <p class="text-2xl font-black font-mono text-violet-400" id="stat-unique-words">—</p>
+            </div>
+            <div class="glass-card rounded-xl p-4 text-center">
+                <p class="text-xs font-semibold text-slate-500 mb-1 uppercase">En Sık Kelime</p>
+                <p class="text-base font-black text-amber-400" id="stat-top-word">—</p>
+            </div>
+            <div class="glass-card rounded-xl p-4 text-center">
+                <p class="text-xs font-semibold text-slate-500 mb-1 uppercase">Tahmini s Üssü</p>
+                <p class="text-xl font-black font-mono text-indigo-400" id="stat-estimated-s">—</p>
+            </div>
+            <div class="glass-card rounded-xl p-4 text-center">
+                <p class="text-xs font-semibold text-slate-500 mb-1 uppercase">Log-Log R²</p>
+                <p class="text-xl font-black font-mono text-emerald-400" id="stat-r-squared">—</p>
+            </div>
+        </div>
+
+        <!-- Grafik + Tablo -->
+        <div class="grid lg:grid-cols-3 gap-8">
+
+            <div class="lg:col-span-2 glass-card rounded-2xl p-6">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+                    <h4 class="text-sm font-semibold text-slate-300">En Sık Kullanılan Kelimelerin Dağılımı</h4>
+                    <label class="flex items-center gap-2 cursor-pointer shrink-0">
+                        <span class="text-xs text-slate-400">Log-Log</span>
+                        <div class="relative">
+                            <input id="word-log-toggle" type="checkbox" class="sr-only peer" />
+                            <div class="w-9 h-5 bg-slate-700 rounded-full peer peer-checked:bg-sky-600 transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:w-4 after:h-4 after:rounded-full after:bg-white after:transition-all peer-checked:after:translate-x-4"></div>
+                        </div>
+                    </label>
+                </div>
+                <div class="relative h-72 sm:h-80">
+                    <canvas id="textAnalysisChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Top 10 Tablo -->
+            <div class="glass-card rounded-2xl overflow-hidden">
+                <div class="px-5 py-4 border-b border-white/5">
+                    <h4 class="text-sm font-semibold text-slate-300">İlk 10 Kelime — Gerçek vs Zipf</h4>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="text-xs font-bold uppercase tracking-wider text-slate-600 border-b border-slate-800">
+                                <th class="py-2.5 px-3 text-left">#</th>
+                                <th class="py-2.5 px-3 text-left">Kelime</th>
+                                <th class="py-2.5 px-3 text-left">Gerçek</th>
+                                <th class="py-2.5 px-3 text-left">Zipf</th>
+                                <th class="py-2.5 px-3 text-right">Fark</th>
+                            </tr>
+                        </thead>
+                        <tbody id="word-table-body">
+                            <!-- JS tarafından doldurulur -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+
+<!-- =========================================================
+     ŞEHİR NÜFUSLARI
+========================================================= -->
+<section id="cities" class="py-20 px-4 sm:px-6 lg:px-8 bg-[#060a12]">
+    <div class="max-w-6xl mx-auto">
+
+        <div class="text-center mb-12">
+            <p class="text-xs font-bold uppercase tracking-widest text-emerald-400 mb-3">İnteraktif Modül 3</p>
+            <h2 class="text-3xl sm:text-4xl font-black text-white mb-4">Şehir Nüfusları & Zipf</h2>
+            <p class="text-slate-400 max-w-2xl mx-auto">Zipf Yasası yalnızca dillerde değil, <strong class="text-white">kentsel hiyerarşilerde</strong> de geçerlidir. Türkiye, ABD ve Dünya şehirlerinin nüfus dağılımları ile teorik Zipf beklentisini karşılaştırın.</p>
+        </div>
+
+        <!-- Dataset Seçici -->
+        <div class="flex flex-wrap items-center justify-center gap-4 mb-8">
+            <div class="glass-card rounded-xl px-4 py-2 flex items-center gap-3">
+                <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Veri Seti</label>
+                <select id="city-dataset-select"
+                        class="bg-transparent text-sm text-white font-semibold focus:outline-none cursor-pointer">
+                    <option value="turkey">🇹🇷 Türkiye (TÜİK 2024)</option>
+                    <option value="usa">🇺🇸 ABD Şehirleri</option>
+                    <option value="world">🌍 Dünya Metropolleri</option>
+                </select>
+            </div>
+
+            <label class="flex items-center gap-2 cursor-pointer glass-card rounded-xl px-4 py-2.5">
+                <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Log-Log</span>
+                <div class="relative">
+                    <input id="city-log-toggle" type="checkbox" class="sr-only peer" />
+                    <div class="w-9 h-5 bg-slate-700 rounded-full peer peer-checked:bg-emerald-600 transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:w-4 after:h-4 after:rounded-full after:bg-white after:transition-all peer-checked:after:translate-x-4"></div>
+                </div>
+            </label>
+        </div>
+
+        <!-- Analiz Notu -->
+        <div class="bg-emerald-500/5 border border-emerald-500/20 rounded-xl px-6 py-4 mb-8 max-w-4xl mx-auto">
+            <p class="text-xs font-semibold text-emerald-400 uppercase tracking-wider mb-1">📝 Veri Seti Notu</p>
+            <p id="city-notes" class="text-slate-400 text-sm leading-relaxed">—</p>
+        </div>
+
+        <!-- Grafik + Tablo -->
+        <div class="grid lg:grid-cols-3 gap-8">
+
+            <div class="lg:col-span-2 glass-card rounded-2xl p-6">
+                <div class="relative h-80 sm:h-96">
+                    <canvas id="cityChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Tablo -->
+            <div class="glass-card rounded-2xl overflow-hidden">
+                <div class="px-5 py-4 border-b border-white/5">
+                    <h4 class="text-sm font-semibold text-slate-300">Gerçek vs Zipf Tahmini</h4>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="text-xs font-bold uppercase tracking-wider text-slate-600 border-b border-slate-800">
+                                <th class="py-2.5 px-3 text-left">#</th>
+                                <th class="py-2.5 px-3 text-left">Şehir</th>
+                                <th class="py-2.5 px-3 text-left">Gerçek</th>
+                                <th class="py-2.5 px-3 text-left">Beklenti</th>
+                                <th class="py-2.5 px-3 text-right">Oran</th>
+                            </tr>
+                        </thead>
+                        <tbody id="city-table-body">
+                            <!-- JS tarafından doldurulur -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Primate City bilgi kutusu -->
+        <div class="mt-10 grid md:grid-cols-2 gap-6">
+            <div class="glass-card rounded-2xl p-6">
+                <h4 class="text-base font-bold text-white mb-3 flex items-center gap-2">
+                    <span class="text-2xl">🏙️</span> Primate City Etkisi
+                </h4>
+                <p class="text-slate-400 text-sm leading-relaxed">
+                    Bir ülkenin en büyük şehri nüfusunun ikinci şehirden çok orantısız büyük olmasına <strong class="text-white">"Primate City" (Başat Şehir)</strong> etkisi denir. Türkiye'de İstanbul (~15.6M) ile Ankara (~5.8M) arasındaki uçurum bunu örnekler. Zipf'in beklentisi (15.6M / 2 = 7.8M) gerçeğin çok üstündedir.
+                </p>
+            </div>
+            <div class="glass-card rounded-2xl p-6">
+                <h4 class="text-base font-bold text-white mb-3 flex items-center gap-2">
+                    <span class="text-2xl">🇺🇸</span> ABD: Kusursuz Zipf Örneği
+                </h4>
+                <p class="text-slate-400 text-sm leading-relaxed">
+                    ABD, Rank-Size Kuralı'na uyan en ideal ülkeler arasındadır. New York (~8.3M) ardından Los Angeles (~3.8M), Chicago (~2.7M) gelir. Oranlar yaklaşık 1 : ½ : ⅓ şeklinde neredeyse <strong class="text-white">mükemmel Zipf uyumu</strong> sergiler.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- =========================================================
+     UYGULAMALAR
+========================================================= -->
+<section id="applications" class="py-20 px-4 sm:px-6 lg:px-8 bg-[#090d16]">
+    <div class="max-w-6xl mx-auto">
+
+        <div class="text-center mb-16">
+            <p class="text-xs font-bold uppercase tracking-widest text-violet-400 mb-3">Modül 4 — Gerçek Dünya</p>
+            <h2 class="text-3xl sm:text-4xl font-black text-white mb-4">Zipf Yasası'nın Uygulamaları</h2>
+            <p class="text-slate-400 max-w-2xl mx-auto">Bu güç yasası, sahaya uygulandığında onlarca farklı alanda verimlilik ve tahmin gücü sağlar.</p>
+        </div>
+
+        <!-- Application Cards -->
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
+
+            <div class="glass-card glass-card-interactive rounded-2xl p-6">
+                <div class="w-12 h-12 rounded-xl bg-indigo-500/15 flex items-center justify-center text-2xl mb-4">🌐</div>
+                <h3 class="text-base font-bold text-white mb-2">Web Trafiği & SEO</h3>
+                <p class="text-slate-400 text-sm leading-relaxed mb-3">İnternet trafiğinin büyük çoğunluğu birkaç büyük siteye akar. Google, YouTube, Facebook Zipf eğrisinin tepesinde. Bu yüzden SEO'da "long-tail anahtar kelimeler" stratejisi Zipf kuyruğunu hedefler.</p>
+                <div class="flex flex-wrap gap-2">
+                    <span class="text-xs px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">SEO</span>
+                    <span class="text-xs px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Dijital Pazarlama</span>
+                </div>
+            </div>
+
+            <div class="glass-card glass-card-interactive rounded-2xl p-6">
+                <div class="w-12 h-12 rounded-xl bg-sky-500/15 flex items-center justify-center text-2xl mb-4">🔬</div>
+                <h3 class="text-base font-bold text-white mb-2">Biyoinformatik & Genomika</h3>
+                <p class="text-slate-400 text-sm leading-relaxed mb-3">DNA dizilerindeki kodon kullanım sıklıkları ve protein aileleri Zipf dağılımına uyar. Ayrıca gen ekspresyon düzeyleri ve kanser mutasyonlarının dağılımı da güç yasalarını takip eder.</p>
+                <div class="flex flex-wrap gap-2">
+                    <span class="text-xs px-2 py-0.5 rounded-full bg-sky-500/10 text-sky-400 border border-sky-500/20">Genomika</span>
+                    <span class="text-xs px-2 py-0.5 rounded-full bg-sky-500/10 text-sky-400 border border-sky-500/20">Biyoistatistik</span>
+                </div>
+            </div>
+
+            <div class="glass-card glass-card-interactive rounded-2xl p-6">
+                <div class="w-12 h-12 rounded-xl bg-amber-500/15 flex items-center justify-center text-2xl mb-4">📦</div>
+                <h3 class="text-base font-bold text-white mb-2">Tedarik Zinciri & Envanter</h3>
+                <p class="text-slate-400 text-sm leading-relaxed mb-3">Ürün satışları Zipf dağılımına uyar: az sayıda ürün satışların büyük bölümünü oluşturur. "ABC Analizi" bu prensibi temel alır ve kritik stok yönetim kararları bu verilerle alınır.</p>
+                <div class="flex flex-wrap gap-2">
+                    <span class="text-xs px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">Lojistik</span>
+                    <span class="text-xs px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">ABC Analizi</span>
+                </div>
+            </div>
+
+            <div class="glass-card glass-card-interactive rounded-2xl p-6">
+                <div class="w-12 h-12 rounded-xl bg-emerald-500/15 flex items-center justify-center text-2xl mb-4">🤖</div>
+                <h3 class="text-base font-bold text-white mb-2">Doğal Dil İşleme (NLP)</h3>
+                <p class="text-slate-400 text-sm leading-relaxed mb-3">GPT gibi dil modelleri, Zipf dağılımından kaynaklanan veri dengesizliğiyle mücadele etmek zorundadır. Eğitim verisi seçimi, tokenizasyon ve subword modelleme (BPE) Zipf'i göz önünde bulundurur.</p>
+                <div class="flex flex-wrap gap-2">
+                    <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">NLP</span>
+                    <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">LLM</span>
+                </div>
+            </div>
+
+            <div class="glass-card glass-card-interactive rounded-2xl p-6">
+                <div class="w-12 h-12 rounded-xl bg-rose-500/15 flex items-center justify-center text-2xl mb-4">📡</div>
+                <h3 class="text-base font-bold text-white mb-2">Ağ Topolojileri</h3>
+                <p class="text-slate-400 text-sm leading-relaxed mb-3">İnternet, sosyal ağlar ve hava ulaşım ağlarında düğüm bağlantı sayıları (derece dağılımı) güç yasasına uyar; birkaç "hub" düğüm trafiğin büyük bölümünü taşır. Bu yapıya <em>Scale-Free Network</em> denir.</p>
+                <div class="flex flex-wrap gap-2">
+                    <span class="text-xs px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20">Graf Teorisi</span>
+                    <span class="text-xs px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20">Scale-Free</span>
+                </div>
+            </div>
+
+            <div class="glass-card glass-card-interactive rounded-2xl p-6">
+                <div class="w-12 h-12 rounded-xl bg-violet-500/15 flex items-center justify-center text-2xl mb-4">💸</div>
+                <h3 class="text-base font-bold text-white mb-2">Finans & Risk Yönetimi</h3>
+                <p class="text-slate-400 text-sm leading-relaxed mb-3">Hisse fiyat hareketleri ve finansal krizler normal dağılımın öngördüğünden çok daha sık "kuyruklarda" yığılır (<em>Fat-Tail</em>). Güç yasaları bu aşırı olayları modellemek için kullanılır.</p>
+                <div class="flex flex-wrap gap-2">
+                    <span class="text-xs px-2 py-0.5 rounded-full bg-violet-500/10 text-violet-400 border border-violet-500/20">Risk Modeli</span>
+                    <span class="text-xs px-2 py-0.5 rounded-full bg-violet-500/10 text-violet-400 border border-violet-500/20">Fat Tail</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Web İstatistikleri Tablosu -->
+        <div class="glass-card rounded-2xl overflow-hidden">
+            <div class="px-6 py-5 border-b border-white/5 flex items-center gap-3">
+                <span class="text-xl">🌐</span>
+                <div>
+                    <h3 class="text-base font-bold text-white">Dünya Web Trafiği Sıralaması</h3>
+                    <p class="text-xs text-slate-500 mt-0.5">Similarweb 2024 tahminlerine göre. Trafik Zipf dağılımına uyar; en büyük site ikincisinin ~2.5 katı trafiği alır.</p>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="text-xs font-bold uppercase tracking-wider text-slate-500 border-b border-slate-800">
+                            <th class="py-3 px-4 text-left">Sıra</th>
+                            <th class="py-3 px-4 text-left">Web Sitesi</th>
+                            <th class="py-3 px-4 text-left">Aylık Ziyaret</th>
+                            <th class="py-3 px-4 text-left">Zipf Oranı</th>
+                            <th class="py-3 px-4 text-right">Pay (%)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="border-b border-slate-800/60 hover:bg-slate-800/30 transition-colors">
+                            <td class="py-3 px-4"><span class="text-violet-400 font-bold">#1</span></td>
+                            <td class="py-3 px-4 font-semibold text-white">Google.com</td>
+                            <td class="py-3 px-4 text-slate-300 font-mono">85.2 Milyar</td>
+                            <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full text-xs bg-violet-500/10 text-violet-400 border border-violet-500/20">1/1 → Referans</span></td>
+                            <td class="py-3 px-4 text-right text-slate-400">%100</td>
+                        </tr>
+                        <tr class="border-b border-slate-800/60 hover:bg-slate-800/30 transition-colors">
+                            <td class="py-3 px-4"><span class="text-indigo-400 font-bold">#2</span></td>
+                            <td class="py-3 px-4 font-semibold text-white">YouTube.com</td>
+                            <td class="py-3 px-4 text-slate-300 font-mono">33.1 Milyar</td>
+                            <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Beklenti: ½ → %38.8</span></td>
+                            <td class="py-3 px-4 text-right text-slate-400">%38.8</td>
+                        </tr>
+                        <tr class="border-b border-slate-800/60 hover:bg-slate-800/30 transition-colors">
+                            <td class="py-3 px-4"><span class="text-sky-400 font-bold">#3</span></td>
+                            <td class="py-3 px-4 font-semibold text-white">Facebook.com</td>
+                            <td class="py-3 px-4 text-slate-300 font-mono">16.8 Milyar</td>
+                            <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full text-xs bg-amber-500/10 text-amber-400 border border-amber-500/20">Beklenti: ⅓ → %19.7</span></td>
+                            <td class="py-3 px-4 text-right text-slate-400">%19.7</td>
+                        </tr>
+                        <tr class="border-b border-slate-800/60 hover:bg-slate-800/30 transition-colors">
+                            <td class="py-3 px-4"><span class="text-slate-400 font-bold">#4</span></td>
+                            <td class="py-3 px-4 font-semibold text-white">Instagram.com</td>
+                            <td class="py-3 px-4 text-slate-300 font-mono">7.1 Milyar</td>
+                            <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full text-xs bg-slate-500/10 text-slate-400 border border-slate-500/20">Beklenti: ¼ → %8.3</span></td>
+                            <td class="py-3 px-4 text-right text-slate-400">%8.3</td>
+                        </tr>
+                        <tr class="border-b border-slate-800/60 hover:bg-slate-800/30 transition-colors">
+                            <td class="py-3 px-4"><span class="text-slate-400 font-bold">#5</span></td>
+                            <td class="py-3 px-4 font-semibold text-white">X (Twitter)</td>
+                            <td class="py-3 px-4 text-slate-300 font-mono">5.8 Milyar</td>
+                            <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full text-xs bg-slate-500/10 text-slate-400 border border-slate-500/20">Beklenti: ⅕ → %6.8</span></td>
+                            <td class="py-3 px-4 text-right text-slate-400">%6.8</td>
+                        </tr>
+                        <tr class="border-b border-slate-800/60 hover:bg-slate-800/30 transition-colors">
+                            <td class="py-3 px-4"><span class="text-slate-400 font-bold">#6</span></td>
+                            <td class="py-3 px-4 font-semibold text-white">Baidu.com</td>
+                            <td class="py-3 px-4 text-slate-300 font-mono">4.7 Milyar</td>
+                            <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full text-xs bg-slate-500/10 text-slate-400 border border-slate-500/20">Beklenti: ⅙ → %5.5</span></td>
+                            <td class="py-3 px-4 text-right text-slate-400">%5.5</td>
+                        </tr>
+                        <tr class="border-b border-slate-800/60 hover:bg-slate-800/30 transition-colors">
+                            <td class="py-3 px-4"><span class="text-slate-400 font-bold">#7</span></td>
+                            <td class="py-3 px-4 font-semibold text-white">Wikipedia.org</td>
+                            <td class="py-3 px-4 text-slate-300 font-mono">4.3 Milyar</td>
+                            <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full text-xs bg-slate-500/10 text-slate-400 border border-slate-500/20">Beklenti: ⅐ → %5.0</span></td>
+                            <td class="py-3 px-4 text-right text-slate-400">%5.0</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+
+<!-- =========================================================
+     BİLGİ YARIŞMASI (QUIZ)
+========================================================= -->
+<section id="quiz" class="py-20 px-4 sm:px-6 lg:px-8 bg-[#060a12]">
+    <div class="max-w-3xl mx-auto">
+
+        <div class="text-center mb-12">
+            <p class="text-xs font-bold uppercase tracking-widest text-amber-400 mb-3">Modül 5 — Bilgi Testi</p>
+            <h2 class="text-3xl sm:text-4xl font-black text-white mb-4">Kendinizi Sınayın</h2>
+            <p class="text-slate-400">Zipf Yasası'nı, güç yasalarını ve gerçek dünya uygulamalarını ne kadar kavradınız? 5 soruluk mini sınav.</p>
+        </div>
+
+        <div class="glass-card rounded-2xl p-6 sm:p-8">
+            <div id="quiz-container">
+                <!-- JS tarafından doldurulur -->
+                <div class="text-center py-12 text-slate-500">Yükleniyor…</div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+
+<!-- =========================================================
+     FOOTER
+========================================================= -->
+<footer class="py-12 px-4 sm:px-6 lg:px-8 border-t border-white/5 bg-[#090d16]">
+    <div class="max-w-6xl mx-auto">
+        <div class="grid md:grid-cols-3 gap-8 mb-10">
+
+            <div>
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-8 h-8 rounded-lg bg-indigo-600/70 flex items-center justify-center text-white text-sm font-black">Z</div>
+                    <span class="font-bold text-white">Zipf Yasası Portalı</span>
+                </div>
+                <p class="text-slate-500 text-sm leading-relaxed">
+                    İstatistik ve veri bilimini gerçek örneklerle öğrenmek için tasarlanmış interaktif bir eğitim platformu.
+                </p>
+            </div>
+
+            <div>
+                <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-4">Modüller</h4>
+                <ul class="space-y-2 text-sm text-slate-500">
+                    <li><a href="#theory" class="hover:text-indigo-400 transition-colors">📐 Matematiksel Teori</a></li>
+                    <li><a href="#simulator" class="hover:text-indigo-400 transition-colors">⚗️ Simülatör</a></li>
+                    <li><a href="#text-analysis" class="hover:text-indigo-400 transition-colors">🔍 Metin Analizi</a></li>
+                    <li><a href="#cities" class="hover:text-indigo-400 transition-colors">🏙️ Şehir Nüfusları</a></li>
+                    <li><a href="#applications" class="hover:text-indigo-400 transition-colors">🌐 Uygulamalar</a></li>
+                    <li><a href="#quiz" class="hover:text-indigo-400 transition-colors">🎯 Bilgi Testi</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-4">Kaynaklar</h4>
+                <ul class="space-y-2 text-sm text-slate-500">
+                    <li>G.K. Zipf — Human Behavior and the Principle of Least Effort (1949)</li>
+                    <li>A. Clauset et al. — Power-Law Distributions in Empirical Data (2009)</li>
+                    <li>M.E.J. Newman — Power laws, Pareto distributions and Zipf's law (2005)</li>
+                    <li>TÜİK — Adrese Dayalı Nüfus Kayıt Sistemi 2023</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="border-t border-white/5 pt-6 text-center text-xs text-slate-600">
+            Tüm veriler eğitim amaçlı derlenmiştir. Grafik motoru: Chart.js • Matematik render: KaTeX • Stil: Tailwind CSS
+        </div>
+    </div>
+</footer>
+
+<!-- Scripts -->
+<script src="js/data.js?v=3"></script>
+<script src="js/charts.js?v=3"></script>
+<script src="js/app.js?v=3"></script>
+
+</body>
+</html>
